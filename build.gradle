@@ -1,0 +1,48 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.2.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+bootJar {
+    baseName = 'gs-rest-service'
+    version =  '0.1.0'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://repo.spring.io/libs-snapshot'
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web") {
+        exclude module: "spring-boot-starter-tomcat"
+    }
+    compile("org.springframework.boot:spring-boot-starter-jetty")
+    compile("org.springframework.data:spring-data-redis:2.0.7.RELEASE")
+    compile("org.springframework.data:spring-data-jdbc:1.0.0.BUILD-SNAPSHOT")
+    compile("com.amazonaws:aws-java-sdk-ec2:1.11.328")
+    compile("com.amazonaws:aws-java-sdk-s3:1.11.328")
+    compile("com.amazonaws:aws-java-sdk-rds:1.11.328")
+    compile("com.amazonaws:aws-java-sdk-elasticbeanstalk:1.11.328")
+    compile("com.amazonaws:aws-java-sdk-elasticache:1.11.328")
+    compile("com.google.guava:guava:25.0-jre")
+    compile("redis.clients:jedis")
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('com.jayway.jsonpath:json-path')
+}
+
