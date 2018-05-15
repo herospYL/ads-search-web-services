@@ -14,7 +14,8 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 bootJar {
-    baseName = 'gs-rest-service'
+    group = 'com.ads.search'
+    baseName = 'ads-web-service'
     version =  '0.1.0'
 }
 
