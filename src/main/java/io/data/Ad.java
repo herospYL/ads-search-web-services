@@ -1,6 +1,6 @@
 package io.data;
 
-import io.service.Utility;
+import io.extra.Utility;
 
 import javax.persistence.*;
 import java.io.Serializable;

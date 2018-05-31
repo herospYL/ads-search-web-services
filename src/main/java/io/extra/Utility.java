@@ -1,5 +1,6 @@
-package io.service;
+package io.extra;
 
+import io.cache.CachePoolType;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -30,6 +31,8 @@ public class Utility {
     public static final String spaceSeparator = " ";
 
     public static final String commaSeparator = ",";
+
+    public static final String cacheSeparator = ":";
 
     static {
         List<String> stopWordsList = new ArrayList<>();
@@ -92,5 +95,14 @@ public class Utility {
         tokenizer.close();
 
         return tokens;
+    }
+
+    /**
+     * @param key The raw cache key
+     * @param type The cache pool's type
+     * @return The final cache key
+     */
+    public static String getCacheKey(String key, CachePoolType type) {
+        return type.toString() + cacheSeparator + key;
     }
 }

@@ -1,4 +1,4 @@
-package io.service;
+package io.repository;
 
 import io.data.Campaign;
 import org.springframework.data.repository.CrudRepository;
