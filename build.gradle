@@ -27,6 +27,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
+    compileOnly("org.springframework.boot:spring-boot-configuration-processor")
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
     }
@@ -43,7 +44,7 @@ dependencies {
     compile('org.apache.lucene:lucene-suggest:7.3.1')
     compile('org.apache.lucene:lucene-analyzers-common:7.3.1')
     compile("com.google.guava:guava:25.0-jre")
+    compile('com.jayway.jsonpath:json-path')
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('com.jayway.jsonpath:json-path')
 }
 

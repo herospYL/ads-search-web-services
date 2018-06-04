@@ -105,4 +105,12 @@ public class Utility {
     public static String getCacheKey(String key, CachePoolType type) {
         return type.toString() + cacheSeparator + key;
     }
+
+    /**
+     * @param x Parameter to be calculated
+     * @return The sigmoid value
+     */
+    public static double sigmoid(double x) {
+        return 1 / (1 + Math.exp(-x));
+    }
 }
