@@ -17,4 +17,12 @@ public class S3Property {
     public Regions getRegions() {
         return regions;
     }
+
+    public void setBucket(String bucket) {
+        this.bucket = bucket;
+    }
+
+    public void setRegions(Regions regions) {
+        this.regions = regions;
+    }
 }

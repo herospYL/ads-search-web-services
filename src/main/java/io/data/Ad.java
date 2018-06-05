@@ -60,13 +60,13 @@ public class Ad implements Serializable {
 
     @PostLoad
     public void keyWordsLoad(){
-        String[] keyWordsSplit = this.keyWordsStr.split(Utility.Separator);
+        String[] keyWordsSplit = this.keyWordsStr.split(Utility.commaSeparator);
         this.keyWords = Arrays.asList(keyWordsSplit);
     }
 
     @PrePersist
     @PreUpdate
     public void keyWordsUpdate(){
-        this.keyWordsStr = String.join(Utility.Separator, this.keyWords);
+        this.keyWordsStr = String.join(Utility.commaSeparator, this.keyWords);
     }
 }
