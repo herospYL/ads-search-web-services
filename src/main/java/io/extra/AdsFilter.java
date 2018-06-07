@@ -5,18 +5,18 @@ import io.data.Ad;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Filter {
+public class AdsFilter {
     private double pClickThreshold;
     private double relevanceScoreThreshold;
     private int minNumOfAds;
 
-    public Filter(double pClickThreshold, double relevanceScoreThreshold, int minNumOfAds) {
+    public AdsFilter(double pClickThreshold, double relevanceScoreThreshold, int minNumOfAds) {
         this.pClickThreshold = pClickThreshold;
         this.relevanceScoreThreshold = relevanceScoreThreshold;
         this.minNumOfAds = minNumOfAds;
     }
 
-    public List<Ad> LevelZeroFilterAds(List<Ad> adsCandidates)
+    public List<Ad> levelZeroFilterAds(List<Ad> adsCandidates)
     {
         if(adsCandidates.size() <= minNumOfAds)
             return adsCandidates;
@@ -32,7 +32,7 @@ public class Filter {
         return unfilteredAds;
     }
 
-    public List<Ad> LevelOneFilterAds(List<Ad> adsCandidates,int k)
+    public List<Ad> levelOneFilterAds(List<Ad> adsCandidates,int k)
     {
         if(adsCandidates.size() <= minNumOfAds)
             return adsCandidates;

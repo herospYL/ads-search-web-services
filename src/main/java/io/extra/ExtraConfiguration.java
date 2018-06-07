@@ -20,7 +20,7 @@ public class ExtraConfiguration {
     }
 
     @Bean
-    public Filter filter() {
-        return new Filter(extraProperty.getPClickThreshold(), extraProperty.getRelevanceScoreThreshold(), extraProperty.getMinNumOfAds());
+    public AdsFilter adsFilter() {
+        return new AdsFilter(extraProperty.getPClickThreshold(), extraProperty.getRelevanceScoreThreshold(), extraProperty.getMinNumOfAds());
     }
 }
