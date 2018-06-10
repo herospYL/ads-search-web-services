@@ -1,19 +1,23 @@
 package io.extra;
 
 import io.data.Ad;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class AdsFilter {
     private double pClickThreshold;
     private double relevanceScoreThreshold;
     private int minNumOfAds;
 
-    public AdsFilter(double pClickThreshold, double relevanceScoreThreshold, int minNumOfAds) {
-        this.pClickThreshold = pClickThreshold;
-        this.relevanceScoreThreshold = relevanceScoreThreshold;
-        this.minNumOfAds = minNumOfAds;
+    @Autowired
+    public AdsFilter(ExtraProperty extraProperty) {
+        this.pClickThreshold = extraProperty.getPClickThreshold();
+        this.relevanceScoreThreshold = extraProperty.getRelevanceScoreThreshold();
+        this.minNumOfAds = extraProperty.getMinNumOfAds();
     }
 
     public List<Ad> levelZeroFilterAds(List<Ad> adsCandidates)

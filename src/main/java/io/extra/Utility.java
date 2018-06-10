@@ -9,6 +9,8 @@ import org.apache.lucene.analysis.en.KStemFilter;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -17,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class Utility {
 
     public static final String spaceSeparator = " ";
@@ -25,11 +28,14 @@ public class Utility {
 
     public static final String cacheSeparator = ":";
 
+    public static final String underscoreSeparator = "_";
+
     private CharArraySet stopWordsSet;
 
-    public Utility(String stopWords) {
+    @Autowired
+    public Utility(ExtraProperty extraProperty) {
         List<String> stopWordsList = new ArrayList<>();
-        for (String stop : stopWords.split(commaSeparator)) {
+        for (String stop : extraProperty.getStopWords().split(commaSeparator)) {
             stopWordsList.add(stop.trim());
         }
         stopWordsSet = new CharArraySet(stopWordsList, true);

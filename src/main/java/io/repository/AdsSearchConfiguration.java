@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @ComponentScan("io")
 @EnableJpaRepositories(basePackages = "io.repository")
-public class AdSearchConfiguration {
+public class AdsSearchConfiguration {
 }

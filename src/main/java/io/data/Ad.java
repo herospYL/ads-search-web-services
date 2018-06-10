@@ -51,7 +51,7 @@ public class Ad implements Serializable {
     public String brand;
 
     @Column(nullable = false)
-    public String detail_url;
+    public String detailUrl;
 
     @Column(nullable = false)
     public String query;
