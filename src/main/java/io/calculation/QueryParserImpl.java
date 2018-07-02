@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class QueryParserImpl implements QueryParser {
@@ -49,10 +50,10 @@ public class QueryParserImpl implements QueryParser {
             String queryKey = Utility.getCacheKey(combinedKey, CachePoolType.synonyms);
 
             Object queryObj = cache.opsForValue().get(queryKey);
-            if (queryObj instanceof List) {
+            if (queryObj instanceof Set) {
                 try {
                     @SuppressWarnings("unchecked")
-                    List<String>  synonyms = (ArrayList<String>)queryObj;
+                    Set<String>  synonyms = (Set<String>)queryObj;
                     for(String synonym : synonyms) {
                         List<String> token_list = new ArrayList<>();
                         String[] s = synonym.split(Utility.underscoreSeparator);
