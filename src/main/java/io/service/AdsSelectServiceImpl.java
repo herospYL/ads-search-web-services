@@ -85,7 +85,7 @@ public class AdsSelectServiceImpl implements AdsSelectService {
                 Optional<Ad> ad = adsRepository.findById(adId);
                 if (ad.isPresent()) {
                     Ad adValue = ad.get();
-                    adValue.relevanceScore = (double) (adCount / adValue.keyWords.size());
+                    adValue.relevanceScore = (double) (adCount / adValue.keywords.size());
                     ads.add(adValue);
                 }
             }

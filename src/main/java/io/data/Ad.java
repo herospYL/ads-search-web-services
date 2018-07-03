@@ -17,9 +17,9 @@ public class Ad implements Serializable {
     public long campaignId;
 
     @Transient
-    public List<String> keyWords;
+    public List<String> keywords;
 
-    public String keyWordsStr;
+    public String keywordsStr;
 
     public double relevanceScore;
 
@@ -59,14 +59,14 @@ public class Ad implements Serializable {
     public String category;
 
     @PostLoad
-    public void keyWordsLoad(){
-        String[] keyWordsSplit = this.keyWordsStr.split(Utility.commaSeparator);
-        this.keyWords = Arrays.asList(keyWordsSplit);
+    public void keywordsLoad(){
+        String[] keyWordsSplit = this.keywordsStr.split(Utility.commaSeparator);
+        this.keywords = Arrays.asList(keyWordsSplit);
     }
 
     @PrePersist
     @PreUpdate
-    public void keyWordsUpdate(){
-        this.keyWordsStr = String.join(Utility.commaSeparator, this.keyWords);
+    public void keywordsUpdate(){
+        this.keywordsStr = String.join(Utility.commaSeparator, this.keywords);
     }
 }

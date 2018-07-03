@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties("extra")
 public class ExtraProperty {
-    private String stopWords;
+    private String stopWords; // Will translate to snake style: stop-words
     private double pClickThreshold;
     private double relevanceScoreThreshold;
     private int minNumOfAds;
