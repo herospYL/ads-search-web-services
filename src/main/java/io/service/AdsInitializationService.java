@@ -1,8 +1,10 @@
 package io.service;
 
+import java.io.IOException;
+
 public interface AdsInitializationService {
-    boolean initializeAds();
-    boolean initializeFeature();
-    boolean initializeSynonym();
-    boolean initializeBudget();
+    boolean initializeAds() throws IOException;
+    boolean initializeFeature() throws IOException;
+    boolean initializeSynonym() throws IOException;
+    boolean initializeBudget() throws IOException;
 }

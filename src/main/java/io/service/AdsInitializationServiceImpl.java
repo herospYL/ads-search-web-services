@@ -59,7 +59,7 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
     }
 
     @Override
-    public boolean initializeAds() {
+    public boolean initializeAds() throws IOException {
         S3Object s3Object = s3Client.getObject(s3Property.getBucket(), initializationProperty.getAdsFile());
 
         try (BufferedReader ctrReader = new BufferedReader(new InputStreamReader(s3Object.getObjectContent()))) {
@@ -73,13 +73,14 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
+            throw e;
         }
 
         return true;
     }
 
     @Override
-    public boolean initializeFeature() {
+    public boolean initializeFeature() throws IOException {
         S3Object s3Object = s3Client.getObject(s3Property.getBucket(), initializationProperty.getFeatureFile());
 
         try (BufferedReader ctrReader = new BufferedReader(new InputStreamReader(s3Object.getObjectContent()))) {
@@ -95,13 +96,14 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
+            throw e;
         }
 
         return true;
     }
 
     @Override
-    public boolean initializeSynonym() {
+    public boolean initializeSynonym() throws IOException {
         S3Object s3Object = s3Client.getObject(s3Property.getBucket(), initializationProperty.getSynonymFile());
 
         try  {
@@ -120,13 +122,14 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
 
         } catch (Exception e) {
             logger.error(e.getMessage());
+            throw e;
         }
 
         return true;
     }
 
     @Override
-    public boolean initializeBudget() {
+    public boolean initializeBudget() throws IOException {
         S3Object s3Object = s3Client.getObject(s3Property.getBucket(), initializationProperty.getBudgetFile());
 
         try (BufferedReader ctrReader = new BufferedReader(new InputStreamReader(s3Object.getObjectContent()))) {
@@ -138,6 +141,7 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
+            throw e;
         }
 
         return true;
