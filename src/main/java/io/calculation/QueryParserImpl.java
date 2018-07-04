@@ -5,7 +5,7 @@ import io.extra.Utility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -18,12 +18,12 @@ import java.util.Set;
 public class QueryParserImpl implements QueryParser {
 
     private Utility utility;
-    private RedisTemplate<String, Object> cache;
+    private StringRedisTemplate cache;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public QueryParserImpl(Utility utility, RedisTemplate<String, Object> cache) {
+    public QueryParserImpl(Utility utility, StringRedisTemplate cache) {
         this.utility = utility;
         this.cache = cache;
     }
@@ -32,8 +32,7 @@ public class QueryParserImpl implements QueryParser {
     public List<String> QueryUnderstand(String query) throws IOException {
         try {
             return utility.cleanedTokenize(query);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error(e.getMessage());
             throw e;
         }
@@ -44,33 +43,23 @@ public class QueryParserImpl implements QueryParser {
         List<List<String>> res = new ArrayList<>();
 
         try {
-            List<String > tokens = utility.cleanedTokenize(query);
+            List<String> tokens = utility.cleanedTokenize(query);
             String combinedKey = String.join(Utility.underscoreSeparator, tokens);
 
             String queryKey = Utility.getCacheKey(combinedKey, CachePoolType.synonyms);
 
-            Object queryObj = cache.opsForValue().get(queryKey);
-            if (queryObj instanceof Set) {
-                try {
-                    @SuppressWarnings("unchecked")
-                    Set<String>  synonyms = (Set<String>)queryObj;
-                    for(String synonym : synonyms) {
-                        List<String> token_list = new ArrayList<>();
-                        String[] s = synonym.split(Utility.underscoreSeparator);
-                        Collections.addAll(token_list, s);
-                        res.add(token_list);
-                    }
+            Set<String> synonyms = cache.opsForSet().members(queryKey);
+            if (synonyms != null) {
+                for (String synonym : synonyms) {
+                    List<String> tokenList = new ArrayList<>();
+                    String[] s = synonym.split(Utility.underscoreSeparator);
+                    Collections.addAll(tokenList, s);
+                    res.add(tokenList);
                 }
-                catch (ClassCastException ce) {
-                    logger.warn(ce.getMessage());
-                    res.add(tokens);
-                }
-            }
-            else {
+            } else {
                 res.add(tokens);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error(e.getMessage());
             throw e;
         }

@@ -9,6 +9,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import io.cache.CachePoolType;
 import io.data.Ad;
+import io.data.Campaign;
 import io.extra.Utility;
 import io.repository.AdsRepository;
 import io.repository.CampaignRepository;
@@ -17,13 +18,15 @@ import io.s3.S3Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -36,26 +39,27 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
 
     private CampaignRepository campaignRepository;
 
-    private RedisTemplate<String, Object> cache;
+    private StringRedisTemplate cache;
 
     private Utility utility;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private AmazonS3 s3Client;
+
     @Autowired
-    public AdsInitializationServiceImpl(S3Property s3Property, InitializationProperty initializationProperty, AdsRepository adsRepository, CampaignRepository campaignRepository, RedisTemplate<String, Object> cache, Utility utility) {
+    public AdsInitializationServiceImpl(S3Property s3Property, InitializationProperty initializationProperty, AdsRepository adsRepository, CampaignRepository campaignRepository, StringRedisTemplate cache, Utility utility) {
         this.s3Property = s3Property;
         this.initializationProperty = initializationProperty;
         this.adsRepository = adsRepository;
         this.campaignRepository = campaignRepository;
         this.cache = cache;
         this.utility = utility;
+        this.s3Client = AmazonS3ClientBuilder.standard().withRegion(s3Property.getRegions()).withCredentials(new ProfileCredentialsProvider()).build();
     }
 
     @Override
     public boolean initializeAds() {
-        AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(s3Property.getRegions()).withCredentials(new ProfileCredentialsProvider()).build();
-
         S3Object s3Object = s3Client.getObject(s3Property.getBucket(), initializationProperty.getAdsFile());
 
         try (BufferedReader ctrReader = new BufferedReader(new InputStreamReader(s3Object.getObjectContent()))) {
@@ -76,17 +80,67 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
 
     @Override
     public boolean initializeFeature() {
-        return false;
+        S3Object s3Object = s3Client.getObject(s3Property.getBucket(), initializationProperty.getFeatureFile());
+
+        try (BufferedReader ctrReader = new BufferedReader(new InputStreamReader(s3Object.getObjectContent()))) {
+            String line;
+            while ((line = ctrReader.readLine()) != null) {
+                DocumentContext json = JsonPath.parse(line);
+
+                String featureKey = json.read("$.feature_key");
+                String featureVal = json.read("$.feature_value");
+
+                String queryKey = Utility.getCacheKey(featureKey, CachePoolType.feature);
+                cache.opsForValue().set(queryKey, featureVal, initializationProperty.getCacheExp(), TimeUnit.SECONDS);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return true;
     }
 
     @Override
     public boolean initializeSynonym() {
-        return false;
+        S3Object s3Object = s3Client.getObject(s3Property.getBucket(), initializationProperty.getSynonymFile());
+
+        try  {
+            DocumentContext json = JsonPath.parse(s3Object.getObjectContent()); // The entire file is one JSON
+
+            Map<String, List<String>> synonyms = json.read("$");
+
+            for (String synonymKey : synonyms.keySet()) {
+                List<String> synonymVals = synonyms.get(synonymKey);
+
+                String queryKey = Utility.getCacheKey(synonymKey, CachePoolType.synonyms);
+
+                cache.opsForSet().union(queryKey, synonymVals);
+                cache.expire(queryKey, initializationProperty.getCacheExp(), TimeUnit.SECONDS);
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return true;
     }
 
     @Override
     public boolean initializeBudget() {
-        return false;
+        S3Object s3Object = s3Client.getObject(s3Property.getBucket(), initializationProperty.getBudgetFile());
+
+        try (BufferedReader ctrReader = new BufferedReader(new InputStreamReader(s3Object.getObjectContent()))) {
+            String line;
+            while ((line = ctrReader.readLine()) != null) {
+                Campaign campaign = parseBudget(line);
+
+                campaignRepository.save(campaign);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return true;
     }
 
     private Ad parseAd(String line) {
@@ -117,6 +171,17 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
         return ad;
     }
 
+    private Campaign parseBudget(String line) {
+        DocumentContext json = JsonPath.parse(line);
+
+        Campaign campaign = new Campaign();
+
+        campaign.campaignId = json.read("$.campaignId");
+        campaign.budget = json.read("$.budget");
+
+        return campaign;
+    }
+
     private void indexingAd(Ad ad) throws IOException {
         try {
             String keywordsStr = String.join(Utility.commaSeparator, ad.keywords);
@@ -125,23 +190,9 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
             for (String queryTerm : tokens) {
                 String queryKey = Utility.getCacheKey(queryTerm, CachePoolType.ad);
 
-                Object queryObj = cache.opsForValue().get(queryKey);
-                Set<Long> adIds;
-                if (queryObj instanceof Set) {
-                    @SuppressWarnings("unchecked")
-                    Set<Long> querySet = (Set<Long>) queryObj;
-                    adIds = querySet;
-                    adIds.add(ad.adId);
-                }
-                else {
-                    adIds = new HashSet<>();
-                    adIds.add(ad.adId);
-                }
-
-                cache.opsForValue().set(queryKey, adIds, initializationProperty.getCacheExp(), TimeUnit.SECONDS);
+                cache.opsForSet().add(queryKey, Long.toString(ad.adId));
+                cache.expire(queryKey, initializationProperty.getCacheExp(), TimeUnit.SECONDS);
             }
-        } catch (ClassCastException ce) {
-            logger.warn(ce.getMessage());
         } catch (IOException e) {
             logger.error(e.getMessage());
             throw e;

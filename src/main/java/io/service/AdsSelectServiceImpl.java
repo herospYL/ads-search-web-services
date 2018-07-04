@@ -10,7 +10,7 @@ import io.repository.AdsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,7 +18,7 @@ import java.util.*;
 @Service
 public class AdsSelectServiceImpl implements AdsSelectService {
 
-    private RedisTemplate<String, Object> cache;
+    private StringRedisTemplate cache;
 
     private AdsRepository adsRepository;
 
@@ -27,7 +27,7 @@ public class AdsSelectServiceImpl implements AdsSelectService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public AdsSelectServiceImpl(RedisTemplate<String, Object> cache, AdsRepository adsRepository, CTRModel ctrModel) {
+    public AdsSelectServiceImpl(StringRedisTemplate cache, AdsRepository adsRepository, CTRModel ctrModel) {
         this.cache = cache;
         this.adsRepository = adsRepository;
         this.ctrModel = ctrModel;
@@ -62,19 +62,15 @@ public class AdsSelectServiceImpl implements AdsSelectService {
             for (String queryTerm : queryTerms) {
                 String queryKey = Utility.getCacheKey(queryTerm, CachePoolType.ad);
 
-                Object queryObj = cache.opsForValue().get(queryKey);
-                if (queryObj instanceof Set) {
-
-                    @SuppressWarnings("unchecked")
-                    Set<Long> adIds = (Set<Long>) queryObj;
-                    if (adIds.size() > 0) {
-                        for (Long adId : adIds) {
-                            if (matchedAds.containsKey(adId)) {
-                                int count = matchedAds.get(adId) + 1;
-                                matchedAds.put(adId, count);
-                            } else {
-                                matchedAds.put(adId, 1);
-                            }
+                Set<String> adIds = cache.opsForSet().members(queryKey);
+                if (adIds != null && adIds.size() > 0) {
+                    for (String adIdStr : adIds) {
+                        Long adId = Long.parseLong(adIdStr);
+                        if (matchedAds.containsKey(adId)) {
+                            int count = matchedAds.get(adId) + 1;
+                            matchedAds.put(adId, count);
+                        } else {
+                            matchedAds.put(adId, 1);
                         }
                     }
                 }
@@ -89,8 +85,6 @@ public class AdsSelectServiceImpl implements AdsSelectService {
                     ads.add(adValue);
                 }
             }
-        } catch (ClassCastException ce) {
-            logger.warn(ce.getMessage());
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw e;
@@ -121,15 +115,10 @@ public class AdsSelectServiceImpl implements AdsSelectService {
                 for (String featureKey : featureKeys) {
                     String queryKey = Utility.getCacheKey(featureKey, CachePoolType.feature);
 
-                    Object queryObj = cache.opsForValue().get(queryKey);
-                    if (queryObj instanceof String) {
-
-                        @SuppressWarnings("unchecked")
-                        String featureStr = (String) queryObj;
-                        if (!Strings.isNullOrEmpty(featureStr)) {
-                            double featureVal = Double.parseDouble(featureStr);
-                            features.add(featureVal);
-                        }
+                    String featureStr = cache.opsForValue().get(queryKey);
+                    if (!Strings.isNullOrEmpty(featureStr)) {
+                        double featureVal = Double.parseDouble(featureStr);
+                        features.add(featureVal);
                     }
                 }
 
