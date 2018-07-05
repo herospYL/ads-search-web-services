@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,8 +42,10 @@ public class AdsServiceImpl implements AdsService {
         this.adsAllocation = adsAllocation;
     }
 
-    @Override
+    @PostConstruct
     public void initialize() throws IOException {
+        // Will be called once this bean has been constructed
+
         adsInitializationService.initializeAds();
         logger.debug("Ads Initialization finished");
         adsInitializationService.initializeBudget();
