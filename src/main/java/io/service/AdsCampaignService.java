@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface AdsCampaignService {
     List<Ad> applyBudget(List<Ad> adsCandidates);
+
     boolean updateCampaign(Campaign campaign);
 }

@@ -10,6 +10,7 @@ public class InitializationProperty {
     private String featureFile;
     private String synonymFile;
     private String budgetFile;
+    private String ctrFile;
     private int cacheExp;
 
     public String getAdsFile() {
@@ -50,5 +51,13 @@ public class InitializationProperty {
 
     public void setCacheExp(int cacheExp) {
         this.cacheExp = cacheExp;
+    }
+
+    public String getCtrFile() {
+        return ctrFile;
+    }
+
+    public void setCtrFile(String ctrFile) {
+        this.ctrFile = ctrFile;
     }
 }

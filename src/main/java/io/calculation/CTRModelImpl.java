@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import io.extra.Utility;
+import io.s3.InitializationProperty;
 import io.s3.S3Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,17 +21,17 @@ import java.util.List;
 
 @Component
 public class CTRModelImpl implements CTRModel {
-    private ArrayList<Double> weights;
-    private Double bias;
+    private List<Double> weights;
+    private double bias;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public CTRModelImpl(S3Property s3Property, CTRProperty ctrProperty) {
+    public CTRModelImpl(S3Property s3Property, InitializationProperty initializationProperty) {
         weights = new ArrayList<>();
         AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(s3Property.getRegions()).withCredentials(new ProfileCredentialsProvider()).build();
 
-        S3Object s3Object = s3Client.getObject(s3Property.getBucket(), ctrProperty.getMethod());
+        S3Object s3Object = s3Client.getObject(s3Property.getBucket(), initializationProperty.getCtrFile());
 
         try (BufferedReader ctrReader = new BufferedReader(new InputStreamReader(s3Object.getObjectContent()))) {
             String line;

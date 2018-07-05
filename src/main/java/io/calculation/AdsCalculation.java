@@ -21,11 +21,10 @@ public class AdsCalculation {
     }
 
     public static void setCostPerClick(List<Ad> adsCandidates) {
-        for(int i = 0; i < adsCandidates.size(); i++) {
-            if(i < adsCandidates.size() - 1) {
+        for (int i = 0; i < adsCandidates.size(); i++) {
+            if (i < adsCandidates.size() - 1) {
                 adsCandidates.get(i).costPerClick = adsCandidates.get(i + 1).rankScore / adsCandidates.get(i).qualityScore + costPerClickCoefficient;
-            }
-            else {
+            } else {
                 adsCandidates.get(i).costPerClick = adsCandidates.get(i).bidPrice;
             }
         }

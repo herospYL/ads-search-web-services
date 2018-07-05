@@ -10,6 +10,8 @@ public class ExtraProperty {
     private double pClickThreshold;
     private double relevanceScoreThreshold;
     private int minNumOfAds;
+    private double mainlinePriceThreshold;
+    private double mainlineRankScoreThreshold;
 
     public String getStopWords() {
         return stopWords;
@@ -41,5 +43,21 @@ public class ExtraProperty {
 
     public void setStopWords(String stopWords) {
         this.stopWords = stopWords;
+    }
+
+    public double getMainlinePriceThreshold() {
+        return mainlinePriceThreshold;
+    }
+
+    public void setMainlinePriceThreshold(double mainlinePriceThreshold) {
+        this.mainlinePriceThreshold = mainlinePriceThreshold;
+    }
+
+    public double getMainlineRankScoreThreshold() {
+        return mainlineRankScoreThreshold;
+    }
+
+    public void setMainlineRankScoreThreshold(double mainlineRankScoreThreshold) {
+        this.mainlineRankScoreThreshold = mainlineRankScoreThreshold;
     }
 }

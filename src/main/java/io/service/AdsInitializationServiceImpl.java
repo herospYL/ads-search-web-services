@@ -106,7 +106,7 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
     public boolean initializeSynonym() throws IOException {
         S3Object s3Object = s3Client.getObject(s3Property.getBucket(), initializationProperty.getSynonymFile());
 
-        try  {
+        try {
             DocumentContext json = JsonPath.parse(s3Object.getObjectContent()); // The entire file is one JSON
 
             Map<String, List<String>> synonyms = json.read("$");

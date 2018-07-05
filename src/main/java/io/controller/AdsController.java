@@ -1,4 +1,5 @@
-//package hello;
+package io.controller;
+
 //
 //import java.util.concurrent.atomic.AtomicLong;
 //import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,3 +18,4 @@
 //                            String.format(template, name));
 //    }
 //}
+
