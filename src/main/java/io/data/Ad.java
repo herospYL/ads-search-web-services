@@ -1,5 +1,6 @@
 package io.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.extra.Utility;
 
 import javax.persistence.*;
@@ -8,32 +9,44 @@ import java.util.Arrays;
 import java.util.List;
 
 @Entity
+@Table(name = "ad")
 public class Ad implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @Column(name = "ad_id")
     public long adId;
 
+    @Column(name = "campaign_id", nullable = false)
     public long campaignId;
+
+    @Column(name = "key_words")
+    @JsonIgnore
+    public String keywordsStr;
 
     @Transient
     public List<String> keywords;
 
-    public String keywordsStr;
-
+    @Transient
     public double relevanceScore;
 
+    @Transient
     public double pClick;
 
-    public double bidPrice;
-
+    @Transient
     public double rankScore;
 
+    @Transient
     public double qualityScore;
 
+    @Transient
     public double costPerClick;
 
+    @Transient
     public int position; //1: top , 2: bottom
+
+    @Column(name = "bid_price")
+    public double bidPrice;
 
     @Column(nullable = false)
     public String title;
@@ -50,11 +63,8 @@ public class Ad implements Serializable {
     @Column(nullable = false)
     public String brand;
 
-    @Column(nullable = false)
+    @Column(name = "detail_url", nullable = false)
     public String detailUrl;
-
-    @Column(nullable = false)
-    public String query;
 
     public String category;
 

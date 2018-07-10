@@ -22,7 +22,7 @@ public class AdsController {
         this.adsService = adsService;
     }
 
-    @RequestMapping("/ad")
+    @RequestMapping("/ads")
     public List<Ad> getAds(@RequestParam(value = "query") String query, @RequestParam(value = "id") String deviceId,
                            @RequestHeader(value = "X-Forwarded-For", required = false, defaultValue = "1010") String deviceIp, @RequestParam(value = "class") String queryClass,
                            @RequestParam(value = "count", required = false, defaultValue = "5") int count) throws IOException {
