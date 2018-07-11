@@ -1,10 +1,12 @@
 package io.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.Strings;
 import io.extra.Utility;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,13 +21,6 @@ public class Ad implements Serializable {
 
     @Column(name = "campaign_id", nullable = false)
     public long campaignId;
-
-    @Column(name = "key_words")
-    @JsonIgnore
-    public String keywordsStr;
-
-    @Transient
-    public List<String> keywords;
 
     @Transient
     public double relevanceScore;
@@ -44,6 +39,10 @@ public class Ad implements Serializable {
 
     @Transient
     public int position; //1: top , 2: bottom
+
+    @Column(name = "key_words")
+    @JsonIgnore
+    public String keywordsStr;
 
     @Column(name = "bid_price")
     public double bidPrice;
@@ -68,15 +67,27 @@ public class Ad implements Serializable {
 
     public String category;
 
-    @PostLoad
-    public void keywordsLoad() {
-        String[] keyWordsSplit = this.keywordsStr.split(Utility.commaSeparator);
-        this.keywords = Arrays.asList(keyWordsSplit);
+    @Transient
+    private List<String> keywords;
+
+    public List<String> getKeywords() {
+        if (this.keywords != null) {
+            return this.keywords;
+        }
+
+        if (!Strings.isNullOrEmpty(this.keywordsStr)) {
+            String[] keyWordsSplit = this.keywordsStr.split(Utility.commaSeparator);
+            this.keywords = Arrays.asList(keyWordsSplit);
+        }
+        else {
+            this.keywords = new ArrayList<>();
+        }
+
+        return this.keywords;
     }
 
-    @PrePersist
-    @PreUpdate
-    public void keywordsUpdate() {
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
         this.keywordsStr = String.join(Utility.commaSeparator, this.keywords);
     }
 }

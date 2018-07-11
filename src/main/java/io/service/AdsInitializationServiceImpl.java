@@ -152,8 +152,8 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
 
         Ad ad = new Ad();
 
-        Long adId = json.read("$.adId");
-        Long campaignId = json.read("$.campaignId");
+        Long adId = json.read("$.adId", Long.class);
+        Long campaignId = json.read("$.campaignId", Long.class);
 
         if (adId == null || campaignId == null) {
             return null;
@@ -162,15 +162,15 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
         ad.adId = adId;
         ad.campaignId = campaignId;
         ad.brand = MoreObjects.firstNonNull(json.read("$.brand"), "");
-        ad.price = MoreObjects.firstNonNull(json.read("$.price"), 100.0);
+        ad.price = MoreObjects.firstNonNull(json.read("$.price", Double.class), 100.0);
         ad.thumbnail = MoreObjects.firstNonNull(json.read("$.thumbnail"), "");
         ad.title = MoreObjects.firstNonNull(json.read("$.title"), "");
         ad.detailUrl = MoreObjects.firstNonNull(json.read("$.detail_url"), "");
-        ad.bidPrice = MoreObjects.firstNonNull(json.read("$.bidPrice"), 1.0);
-        ad.pClick = MoreObjects.firstNonNull(json.read("$.pClick"), 0.0);
+        ad.bidPrice = MoreObjects.firstNonNull(json.read("$.bidPrice", Double.class), 1.0);
+        ad.pClick = MoreObjects.firstNonNull(json.read("$.pClick", Double.class), 0.0);
         ad.category = MoreObjects.firstNonNull(json.read("$.category"), "");
         ad.description = MoreObjects.firstNonNull(json.read("$.description"), "");
-        ad.keywords = MoreObjects.firstNonNull(json.read("$.keyWords"), new ArrayList<>()); // TODO: JSON uses keyWords instead
+        ad.setKeywords(MoreObjects.firstNonNull(json.read("$.keyWords"), new ArrayList<>())); // TODO: JSON uses keyWords instead
 
         return ad;
     }
@@ -180,16 +180,15 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
 
         Campaign campaign = new Campaign();
 
-        campaign.campaignId = json.read("$.campaignId");
-        campaign.budget = json.read("$.budget");
+        campaign.campaignId = json.read("$.campaignId", Long.class);
+        campaign.budget = json.read("$.budget", Double.class);
 
         return campaign;
     }
 
     private void indexingAd(Ad ad) throws IOException {
         try {
-            String keywordsStr = String.join(Utility.commaSeparator, ad.keywords);
-            List<String> tokens = utility.cleanedTokenize(keywordsStr); // Ad's own method only triggers before persisting to DB
+            List<String> tokens = utility.cleanedTokenize(ad.keywordsStr);
 
             for (String queryTerm : tokens) {
                 String queryKey = Utility.getCacheKey(queryTerm, CachePoolType.ad);
