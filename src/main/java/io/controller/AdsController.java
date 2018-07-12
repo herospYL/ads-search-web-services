@@ -24,9 +24,9 @@ public class AdsController {
 
     @RequestMapping("/ads")
     public List<Ad> getAds(@RequestParam(value = "query") String query, @RequestParam(value = "id") String deviceId,
-                           @RequestHeader(value = "X-Forwarded-For", required = false, defaultValue = "1010") String deviceIp, @RequestParam(value = "class") String queryClass,
+                           @RequestHeader(value = "X-Forwarded-For", required = false, defaultValue = "0") String deviceIp, @RequestParam(value = "category") String queryCategory,
                            @RequestParam(value = "count", required = false, defaultValue = "5") int count) throws IOException {
-        return this.adsService.selectAds(query, deviceId, deviceIp, queryClass, count);
+        return this.adsService.selectAds(query, deviceId, deviceIp, queryCategory, count);
     }
 }
 

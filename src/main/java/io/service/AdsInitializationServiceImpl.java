@@ -92,7 +92,12 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
                 String featureVal = json.read("$.feature_value");
 
                 String queryKey = Utility.getCacheKey(featureKey, CachePoolType.feature);
-                cache.opsForValue().set(queryKey, featureVal, initializationProperty.getCacheExp(), TimeUnit.SECONDS);
+                if (initializationProperty.getCacheExp() >= 0) {
+                    cache.opsForValue().set(queryKey, featureVal, initializationProperty.getCacheExp(), TimeUnit.SECONDS);
+                }
+                else {
+                    cache.opsForValue().set(queryKey, featureVal);
+                }
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -117,7 +122,9 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
                 String queryKey = Utility.getCacheKey(synonymKey, CachePoolType.synonyms);
 
                 cache.opsForSet().union(queryKey, synonymVals);
-                cache.expire(queryKey, initializationProperty.getCacheExp(), TimeUnit.SECONDS);
+                if (initializationProperty.getCacheExp() >= 0) {
+                    cache.expire(queryKey, initializationProperty.getCacheExp(), TimeUnit.SECONDS);
+                }
             }
 
         } catch (Exception e) {
@@ -194,7 +201,9 @@ public class AdsInitializationServiceImpl implements AdsInitializationService {
                 String queryKey = Utility.getCacheKey(queryTerm, CachePoolType.ad);
 
                 cache.opsForSet().add(queryKey, Long.toString(ad.adId));
-                cache.expire(queryKey, initializationProperty.getCacheExp(), TimeUnit.SECONDS);
+                if (initializationProperty.getCacheExp() >= 0) {
+                    cache.expire(queryKey, initializationProperty.getCacheExp(), TimeUnit.SECONDS);
+                }
             }
         } catch (IOException e) {
             logger.error(e.getMessage());

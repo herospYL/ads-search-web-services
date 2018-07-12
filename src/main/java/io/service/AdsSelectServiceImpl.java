@@ -81,7 +81,7 @@ public class AdsSelectServiceImpl implements AdsSelectService {
                 Optional<Ad> ad = adsRepository.findById(adId);
                 if (ad.isPresent()) {
                     Ad adValue = ad.get();
-                    adValue.relevanceScore = (double) (adCount / adValue.getKeywords().size());
+                    adValue.relevanceScore = (double) adCount / adValue.getKeywords().size();
                     ads.add(adValue);
                 }
             }
@@ -119,6 +119,9 @@ public class AdsSelectServiceImpl implements AdsSelectService {
                     if (!Strings.isNullOrEmpty(featureStr)) {
                         double featureVal = Double.parseDouble(featureStr);
                         features.add(featureVal);
+                    }
+                    else {
+                        features.add(0.0);
                     }
                 }
 

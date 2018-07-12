@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,12 @@ public class CTRModelImpl implements CTRModel {
             String line;
             while ((line = ctrReader.readLine()) != null) {
                 DocumentContext json = JsonPath.parse(line);
-                weights = json.read("$.weights");
+
+                List<BigDecimal> weightsDefault = json.read("$.weights");
+                for (BigDecimal w : weightsDefault) {
+                    weights.add(w.doubleValue());
+                }
+
                 bias = json.read("$.bias");
             }
         } catch (Exception e) {

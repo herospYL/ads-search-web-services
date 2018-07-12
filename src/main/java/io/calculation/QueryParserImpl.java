@@ -49,7 +49,7 @@ public class QueryParserImpl implements QueryParser {
             String queryKey = Utility.getCacheKey(combinedKey, CachePoolType.synonyms);
 
             Set<String> synonyms = cache.opsForSet().members(queryKey);
-            if (synonyms != null) {
+            if (synonyms != null && !synonyms.isEmpty()) {
                 for (String synonym : synonyms) {
                     List<String> tokenList = new ArrayList<>();
                     String[] s = synonym.split(Utility.underscoreSeparator);

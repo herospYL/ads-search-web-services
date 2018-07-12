@@ -23,18 +23,23 @@ public class Ad implements Serializable {
     public long campaignId;
 
     @Transient
+    @JsonIgnore
     public double relevanceScore;
 
     @Transient
+    @JsonIgnore
     public double pClick;
 
     @Transient
+    @JsonIgnore
     public double rankScore;
 
     @Transient
+    @JsonIgnore
     public double qualityScore;
 
     @Transient
+    @JsonIgnore
     public double costPerClick;
 
     @Transient
@@ -68,6 +73,7 @@ public class Ad implements Serializable {
     public String category;
 
     @Transient
+    @JsonIgnore
     private List<String> keywords;
 
     public List<String> getKeywords() {
